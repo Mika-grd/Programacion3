@@ -1,5 +1,4 @@
 defmodule Tres do
-
   defp longitud(contrasena) do
     if Enum.count(contrasena) >= 8 do
       {:ok, "Correcta", contrasena}
@@ -46,14 +45,11 @@ defmodule Tres do
   end
 
   def revisar_contrasena(contrasena) do
-    chars = String.graphemes(contrasena)
-
-    resultado = longitud(chars)
-    resultado = mayuscula(resultado)
-    resultado = numero(resultado)
-    resultado = espacio(resultado)
-
-    resultado
+    String.graphemes(contrasena)
+    |> longitud()
+    |> mayuscula()
+    |> numero()
+    |> espacio()
   end
 end
 
