@@ -7,19 +7,22 @@ defmodule Tres do
     end
   end
 
-  defp mayuscula(mensaje) do
-    contrasena = elem(mensaje, 2)
-
+  defp mayuscula({:ok, "Correcta", contrasena}) do
     if Enum.any?(contrasena, fn x -> x != String.downcase(x) end) do
-      mensaje
+      {:ok, "Correcta", contrasena}
     else
-      {:error, "#{elem(mensaje, 1)}\nDebe tener al menos 1 mayúscula", contrasena}
+      {:error, "Debe tener al menos 1 mayúscula", contrasena}
+    end
+  end
+  defp mayuscula({:error, msg, contrasena}) do
+    if Enum.any?(contrasena, fn x -> x != String.downcase(x) end) do
+      {:error, msg, contrasena}
+    else
+      {:error, msg <> " Debe tener al menos 1 mayúscula.", contrasena}
     end
   end
 
-  defp numero(mensaje) do
-    contrasena = elem(mensaje, 2)
-
+  defp numero({:ok, "Correcta", contrasena}) do
     if Enum.any?(contrasena, fn x ->
          try do
            _ = String.to_integer(x)
@@ -28,19 +31,38 @@ defmodule Tres do
            _ -> false
          end
        end) do
-      mensaje
+      {:ok, "Correcta", contrasena}
     else
-      {:error, "#{elem(mensaje, 1)}\nDebe tener al menos 1 numero", contrasena}
+      {:error, "Debe tener al menos 1 numero", contrasena}
+    end
+  end
+  defp numero({:error, msg, contrasena}) do
+    if Enum.any?(contrasena, fn x ->
+         try do
+           _ = String.to_integer(x)
+           true
+         rescue
+           _ -> false
+         end
+       end) do
+      {:error, msg, contrasena}
+    else
+      {:error, msg <> " Debe tener al menos 1 numero.", contrasena}
     end
   end
 
-  defp espacio(mensaje) do
-    contrasena = elem(mensaje, 2)
-
+  defp espacio({:ok, "Correcta", contrasena}) do
     if Enum.any?(contrasena, fn x -> x == " " end) do
-      {:error, "#{elem(mensaje, 1)}\nNo debe contener espacios", contrasena}
+      {:error, "No debe contener espacios", contrasena}
     else
-      mensaje
+      {:ok, "Correcta", contrasena}
+    end
+  end
+  defp espacio({:error, msg, contrasena}) do
+    if Enum.any?(contrasena, fn x -> x == " " end) do
+      {:error, msg <> " No debe contener espacios.", contrasena}
+    else
+      {:error, msg, contrasena}
     end
   end
 
