@@ -18,7 +18,6 @@ defmodule Descuento do
 
   @doc """
   Función principal de la aplicación.
-
   Solicita al usuario:
     - El valor del producto (entero).
     - El porcentaje de descuento (real).
