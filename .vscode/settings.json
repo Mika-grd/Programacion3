@@ -1,6 +1,9 @@
 {
     "github.copilot.nextEditSuggestions.fixes": false,
     "files.exclude": {
-        "**/*.beam": true
-    }       
+        "**/*.beam": true,
+        "**/*.class": true
+    }
+
+
 }
