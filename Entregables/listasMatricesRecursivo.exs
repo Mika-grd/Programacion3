@@ -125,6 +125,47 @@ defmodule Taller do
     end)
   end
 
+
+  #alternativa punto numero 5: DP con memo para reducir el tiempo de ejecucion, excluyendo repetidos por orden
+
+  def subsets(list, target) do
+    do_subsets(list, target, 0, %{})
+  end
+
+  defp do_subsets(_list, 0, _index, _memo), do: [[]]
+  defp do_subsets(list, target, index, memo) do
+    key = {target, index}
+
+    case Map.get(memo, key) do
+      nil ->
+        results =
+          if index >= length(list) do
+            []
+          else
+            h = Enum.at(list, index)
+            t = index + 1
+
+            with_h =
+              if h <= target do
+                Enum.map(do_subsets(list, target - h, index, memo), fn subset -> [h | subset] end)
+              else
+                []
+              end
+
+            without_h = do_subsets(list, target, t, memo)
+
+            with_h ++ without_h
+          end
+
+        results
+
+      cached ->
+        cached
+    end
+  end
+
+
+
 end
 
 
@@ -136,4 +177,6 @@ IO.puts("Matrix transposition:")
 IO.inspect(Taller.matrix_transposition([[1,2,3], [4,5,6]]))
 
 IO.puts("Combination sum [2,3,6,7] target 7:")
-IO.inspect(Taller.allTheWay([2,3,6,7], [], 7, 0, []), charlists: :as_lists)
+IO.inspect(Taller.allTheWay([1, 2,3,6,7], [], 7, 0, []), charlists: :as_lists)
+
+IO.inspect(Taller.subsets([1, 2, 3, 6, 7], 7), charlists: :as_lists)
