@@ -1,7 +1,7 @@
 defmodule DivideYVenceras do
   @moduledoc """
   ## Módulo DivideYVenceras
-  **Autor:** Miguel Ángel Betancourt
+  **Autor:** Miguel ÁngIO.puts(DivideYVenceras.mayor_lista([10, 2, 3, 4, 5, 8, 9]))l Betancourt
   **Fecha:** 23 de septiembre de 2025
   **Licencia:** GNU GPL V3
 
@@ -77,6 +77,24 @@ defmodule DivideYVenceras do
     recorrer(izq)
     recorrer(der)
   end
+
+
+
+
+  #Divide y venceras mayor en la lista
+
+  def mayor_lista([x]) do
+    x
+  end
+
+  def mayor_lista(lista) do
+    {izq, der} = Enum.split(lista, div(length(lista), 2))
+    mayor_izq = mayor_lista(izq)
+    mayor_der = mayor_lista(der)
+    max(mayor_izq, mayor_der)
+  end
 end
+
+IO.puts(DivideYVenceras.mayor_lista([10, 2, 3, 4, 5, 8, 9]))
 
 DivideYVenceras.recorrer([1, 2, 3, 4, 5])
