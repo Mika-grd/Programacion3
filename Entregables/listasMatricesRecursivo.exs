@@ -108,8 +108,6 @@ defmodule Taller do
 
   #Punto numero 5: Resolver una suma objetivo con combinaciones de una lista jajaj es DP
 
-  #candidates = [2,3,6,7], target = 7 Output: [[2,2,3],[7]]
-
   def allTheWay(list, current, target, acc, totalCurrents) do
     Enum.reduce(list, totalCurrents, fn x, acc_total ->
       if x + acc == target do
