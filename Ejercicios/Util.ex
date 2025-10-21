@@ -139,4 +139,12 @@ defmodule Util do
         mensaje |> Util.ingresar(:real)
     end
   end
+
+  def ingresar(mensaje, :boolean) do
+  valor =
+    mensaje
+    |> ingresar(:texto)
+    |> String.downcase()
+  Enum.member?(["yes", "y", "yeah"], valor)
+  end
 end
