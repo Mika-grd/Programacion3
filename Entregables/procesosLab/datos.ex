@@ -1,67 +1,129 @@
-defmodule Autor do
-  defstruct nombre: "", cedula: "", programa: "", titulo: ""
+defmodule Estudiante do
+  defstruct nombre: "", cedula: "", programa: "", email: ""
+
+  def nuevo(nombre, cedula, programa, email) do
+    %Estudiante{nombre: nombre, cedula: cedula, programa: programa, email: email}
+  end
 
   def construir() do
-
-    nombre = "ingrese el nombre: "
+    nombre = "Ingrese el nombre: "
     |> Util.ingresar(:texto)
 
-    cedula = "ingrese la cedula: "
+    cedula = "Ingrese la cédula: "
     |> Util.ingresar(:texto)
 
-    programa = "ingrese el programa: "
+    programa = "Ingrese el programa: "
     |> Util.ingresar(:texto)
 
-    titulo = "ingrese el titulo: "
+    email = "Ingrese el email: "
     |> Util.ingresar(:texto)
 
-    autor = %Autor{nombre: nombre, cedula: cedula, programa: programa, titulo: titulo}
-
-    escribir_csv(autor)
-
+    %Estudiante{nombre: nombre, cedula: cedula, programa: programa, email: email}
   end
 
   def buscar(cedula, lista) do
-    Enum.filter(lista, fn autor -> autor.cedula == cedula end)
+    Enum.find(lista, fn estudiante -> estudiante.cedula == cedula end)
   end
 
-  def escribir_csv(autor) do
-    datos = "Nombre: #{autor.nombre}, Cedula: #{autor.cedula}, Programa: #{autor.programa}, Titulo: #{autor.titulo}\n"
-    File.write("autores.csv", datos, [:append])
+  def listar(lista) do
+    Enum.map(lista, fn est ->
+      "#{est.cedula} | #{est.nombre} | #{est.programa} | #{est.email}"
+    end)
   end
 
+  def to_csv(estudiante) do
+    "#{estudiante.cedula},#{estudiante.nombre},#{estudiante.programa},#{estudiante.email}\n"
+  end
+
+  def from_csv(linea) do
+    [cedula, nombre, programa, email] = String.split(linea, ",") |> Enum.map(&String.trim/1)
+    %Estudiante{cedula: cedula, nombre: nombre, programa: programa, email: email}
+  end
+
+  def cargar_csv(archivo \\ "estudiantes.csv") do
+    case File.read(archivo) do
+      {:ok, contenido} ->
+        contenido
+        |> String.split("\n", trim: true)
+        |> Enum.map(&from_csv/1)
+      {:error, _} -> []
+    end
+  end
+
+  def guardar_csv(estudiantes, archivo \\ "estudiantes.csv") do
+    contenido = Enum.map_join(estudiantes, "", &to_csv/1)
+    File.write(archivo, contenido)
+  end
 end
 
 defmodule Trabajo do
-  defstruct fecha: "", titulo: "", descripcion: "", autores: []
+  defstruct id: "", fecha: "", titulo: "", descripcion: "", autores_cedulas: []
+
+  def nuevo(id, fecha, titulo, descripcion, autores_cedulas) do
+    %Trabajo{id: id, fecha: fecha, titulo: titulo, descripcion: descripcion, autores_cedulas: autores_cedulas}
+  end
 
   def construir() do
-    fecha = "ingrese la fecha: "
+    id = "Ingrese el ID: "
     |> Util.ingresar(:texto)
 
-    titulo = "ingrese el titulo: "
+    fecha = "Ingrese la fecha (DD/MM/AAAA): "
     |> Util.ingresar(:texto)
 
-    descripcion = "ingrese la descripcion: "
+    titulo = "Ingrese el título: "
+    |> Util.ingresar(:texto)
+
+    descripcion = "Ingrese la descripción: "
     |> Util.ingresar(:texto)
 
     cantidad = "¿Cuántos autores tiene el trabajo? "
     |> Util.ingresar(:entero)
 
-    autores = for _ <- 1..cantidad, do: Autor.construir()
+    autores_cedulas = for _ <- 1..cantidad do
+      Util.ingresar("Ingrese cédula del autor: ", :texto)
+    end
 
-    trbajo = %Trabajo{fecha: fecha, titulo: titulo, descripcion: descripcion, autores: autores}
-
-    escribir_csv(trbajo)
-
+    %Trabajo{id: id, fecha: fecha, titulo: titulo, descripcion: descripcion, autores_cedulas: autores_cedulas}
   end
 
   def buscar(titulo, lista) do
-    Enum.filter(lista, fn trabajo -> trabajo.titulo == titulo end)
+    Enum.find(lista, fn trabajo -> String.downcase(trabajo.titulo) == String.downcase(titulo) end)
   end
 
-  def escribir_csv(trabajo) do
-    datos = "Fecha: #{trabajo.fecha}, Titulo: #{trabajo.titulo}, Descrpicion: #{trabajo.descripcion}, Autores: #{trabajo.autores} \n "
-    File.write("trabajos.csv", datos, :append)
+  def buscar_por_id(id, lista) do
+    Enum.find(lista, fn trabajo -> trabajo.id == id end)
+  end
+
+  def listar(lista) do
+    Enum.map(lista, fn trab ->
+      autores = Enum.join(trab.autores_cedulas, ", ")
+      "ID: #{trab.id} | #{trab.titulo} | Fecha: #{trab.fecha} | Autores: #{autores}"
+    end)
+  end
+
+  def to_csv(trabajo) do
+    autores = Enum.join(trabajo.autores_cedulas, ";")
+    "#{trabajo.id},#{trabajo.fecha},#{trabajo.titulo},#{trabajo.descripcion},#{autores}\n"
+  end
+
+  def from_csv(linea) do
+    [id, fecha, titulo, descripcion, autores_str] = String.split(linea, ",", parts: 5) |> Enum.map(&String.trim/1)
+    autores_cedulas = String.split(autores_str, ";", trim: true) |> Enum.map(&String.trim/1)
+    %Trabajo{id: id, fecha: fecha, titulo: titulo, descripcion: descripcion, autores_cedulas: autores_cedulas}
+  end
+
+  def cargar_csv(archivo \\ "trabajos.csv") do
+    case File.read(archivo) do
+      {:ok, contenido} ->
+        contenido
+        |> String.split("\n", trim: true)
+        |> Enum.map(&from_csv/1)
+      {:error, _} -> []
+    end
+  end
+
+  def guardar_csv(trabajos, archivo \\ "trabajos.csv") do
+    contenido = Enum.map_join(trabajos, "", &to_csv/1)
+    File.write(archivo, contenido)
   end
 end
